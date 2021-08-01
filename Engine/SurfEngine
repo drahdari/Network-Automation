@@ -1,1 +1,103 @@
 
+
+#### This is My Engine code for surfing a netwok connected By OSPF Routing Protocol and Have desirable action on the devices ####
+#### The Code Asks for the depth of OSPF for which we want to surf the network, as the network might be giant and we want to just check specific part ####
+#### Please consider that I have not put all the classes parameters and specification in the code ####
+
+
+   
+   def Recursive_Check(self, conn, Checked_Devices, Dev:Device, Depth:int):
+        rs_Choice = self.OPs
+        options = self.OPs.split(",")
+        Proxy = str()
+        if Depth >= 1:    ## This is checking whether we are connecting through devices's CLI or directly from the host terminal
+            Proxy = 1
+        else:
+            Proxy = 0
+        c1 = 0
+        
+        Existed = False  ## A boolean to avoid extra connection in CLI
+        Status=True     ## Sucess/Failed connection to the target device
+        
+        for option in options:
+        
+            self.OPs = option
+            if c1 > 0:   
+                Existed = True
+              
+            Status = self.run_command(Proxy, conn, Existed, Depth,Dev)
+           
+           if not Status:
+                break
+            c1 += 1
+        
+        self.OPs = rs_Choice
+        Checked_Devices.append(Dev)
+        if Proxy == 0:
+            Dev.OSPF_Neighbors(conn)    ## Identify all the OSPF neighbors
+            
+        if Proxy == 1 and Status:
+            self.establish_connection_proxy(conn, Dev.Mgmt, "Close")
+            return "0"
+        c1 = 0
+
+        for O_Process in Dev.OSPFs:     ## go in depth for the rest of neighbors
+        
+            for neighbor in O_Process.Neighbors:
+                if (c1 <= Depth) and Proxy == 0:   > Stop Condition
+                
+                    Checked_Devices.append(Device(neighbor.RID))
+                else:
+                    if not Device(str(neighbor.RID)) in Checked_Devices:
+                        N_Dev=Device(neighbor.RID)
+                        self.Recursive_Check(conn, Checked_Devices, N_Dev, int(Depth) + 1)
+                c1 += 1
+        return Checked_Devices
+        
+        
+        
+def run_command(self, Proxy, conn, Existed, Depth:int ,Dev:Device):
+        if Proxy == 1 and not Existed:
+            Re=bool()
+            Re=self.establish_connection_proxy(conn, Dev.Mgmt, "Establish")
+            print("Level: {} Device: {}".format(str(Depth + 1), str(Dev.Mgmt)))
+            if not Re:
+                return False    "" Failed to connect to the Device
+                
+        if not Existed:
+            Dev.Initial_Info_Gathering(conn) 
+      
+        self.Command(conn, Proxy, Dev, Depth) "" run the required operation
+        return True
+
+
+
+ def OSPF_Neighbors(self, conn):
+        if self.Empty_OSPF():
+            OSPF_P_ID_Output = conn.send_command("show runn | inc router ospf", delay_factor=2, expect_string='#')   
+        
+            OSPF_P_ID_Output = str(OSPF_P_ID_Output).split("\n")
+            
+            ##Check Neighbors Per OSPF Process ID
+            for line in OSPF_P_ID_Output:
+                line = line.split()
+                if len(line) > 1:
+                    OSPFPR = OSPF_Process(int(line[2]))
+                    OSPFPR.Identify_OSPF_Neighbour_BR(conn, 0)
+                    self.OSPFs.append(OSPFPR)
+
+
+ def Identify_OSPF_Neighbour_BR(self, conn, print_type:int):
+        output = conn.send_command("show ip ospf "+ str(self.P_ID) + " neighb ", delay_factor=2)
+        if len(output) > 1:
+            if print_type == 1:
+                output = output.split("\n")
+                del output[0]
+                for line in output:
+                    line = line.split()
+                    if len(line) > 2 and not "#" in line:
+                        Nei=OSPF_Neighbor(str(line[0]))
+                        Nei.Status=str(line[2])[0:str(line[2]).find("/")]
+                        Nei.Interface=str(line[len(line)-1])
+                        Nei.Interconnection_IP=str(len(line)-2)
+                        self.Neighbors.append(Nei)
