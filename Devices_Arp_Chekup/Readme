@@ -1,0 +1,3 @@
+This Python code is built to identify which ips are deleted, Added, and Changed(Based on the previous Mac Address to a particular Device)
+
+The output value of this code comes into a place when an Operator Company wants to keep track of the authorized and Unauthorized changes in the RAN section of it's network
