@@ -1,3 +1,8 @@
+// this piece of program  identifyies the information regarding the Network Interface Card of a System
+// The program is written in a way to be easily used for Relational Database Data insertion.
+// In the program, I used map and aray data structures
+
+
 package main
 
 import (
@@ -16,7 +21,9 @@ func NIC_Retrival() {
 		return
 	} else {
 		var MAP_Interfaces = map[int]map[string]string{}
+		// defining map data structure so data can be categorized 
 		for _, IF := range interfaces {
+			// seperating and fetching Ipv4 and IPv6 addressess
 			var IPs [2]string = IP_Retrival(IF)
 			MAP_Interfaces[IF.Index] = map[string]string{}
 			MAP_Interfaces[IF.Index]["Name"] = IF.Name
