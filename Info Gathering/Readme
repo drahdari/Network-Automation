@@ -1,0 +1,11 @@
+This Directory contains all python fucntions of a specific class with the main focus on accomplishing below tasks:
+
+1) Initial info gathering which works in sumary and verbose mode. It is lie the Ansible's first info gathering but in more details
+
+2) It identifies OSPF neighbors and OSPF end to end reachability dynamically, 
+
+3) Logical (Etherchannels) and Physical BW calculation and identifying potential congested links.
+
+4) Device's physical health check
+
+5) Changing a typical Interface configurations
